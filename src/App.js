@@ -4,16 +4,17 @@ import React, {
   createContext,
   useRef,
   useCallback,
+  Suspense
 } from "react";
 import "./App.css";
-import EmailBody from "./components/EmailBody";
-import Email from "./components/Email";
 import { useSelector, useDispatch } from "react-redux";
 import { useLocalStorage } from "./components/useLocalStorage";
 import { DualPanel } from "./components/styledComponents/ButtonStyles";
 import { getUserList, getEmailBody } from "./components/asyncAction";
-import FilterComponent from "./components/Filtercomponent";
-
+import ErrorBoundaries from "./ErrorBoundaries";
+const Email =React.lazy(()=>import("./components/Email"));
+const EmailBody=React.lazy(()=>import("./components/EmailBody"))
+const FilterComponent=React.lazy(()=>import("./components/Filtercomponent"))
 
 export const EmailContext = createContext();
 
@@ -87,10 +88,13 @@ function App() {
     };
     return (
       <div className="background">
+      <ErrorBoundaries>
+       <Suspense fallback={<h1>page is Loading....please wait</h1>}>
         <header>
           <FilterComponent {...props} />
         </header>
         <main>
+         
           <DualPanel onClick={() => setDualPanel(true)}>
             <section className={dualPanel ? "dualpanel" : "nodualpanel"}>
               <>
@@ -118,6 +122,7 @@ function App() {
             )}
 			</section>
           </DualPanel>
+         
         </main>
         <footer className="pagination">
           <button
@@ -133,6 +138,8 @@ function App() {
             2
           </button>
         </footer>
+        </Suspense>
+        </ErrorBoundaries>
       </div>
     );
   } else {
